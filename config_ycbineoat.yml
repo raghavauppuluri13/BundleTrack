@@ -4,7 +4,8 @@ model_name: 021_bleach_cleanser
 model_dir: /media/bowen/e25c9489-2f57-42dd-b076-021c59369fec/DATASET/YCB_Video_Dataset/CADmodels/021_bleach_cleanser/textured_simple.obj
 debug_dir: /tmp/BundleTrack/
 LOG: 0
-port: '5555'
+port: '1234'
+not_segmented: 0 # are images already segmented
 
 depth_processing:
   erode:

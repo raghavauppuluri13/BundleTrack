@@ -814,6 +814,8 @@ void Lfnet::detectFeature(std::shared_ptr<Frame> frame, const float rot_deg)
   const int W = roi(1)-roi(0);
   const int H = roi(3)-roi(2);
 
+  std::printf("WxH: %d, %d\n", W,H);
+
   Eigen::Matrix3f forward_transform(Eigen::Matrix3f::Identity());
   Eigen::Matrix3f new_transform(Eigen::Matrix3f::Identity());
 

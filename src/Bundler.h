@@ -73,7 +73,7 @@ public:
 
 
 public:
-  Bundler(std::shared_ptr<YAML::Node> yml1, DataLoaderBase *data_loader);
+  Bundler(std::shared_ptr<YAML::Node> yml1, DataLoaderBase *data_loader=NULL);
   void processNewFrame(std::shared_ptr<Frame> frame);
   void checkAndAddKeyframe(std::shared_ptr<Frame> frame);
   void optimizeToPrev(std::shared_ptr<Frame> frame);

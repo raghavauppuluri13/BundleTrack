@@ -43,7 +43,7 @@ typedef std::pair<int,int> IndexPair;
 using namespace std;
 using namespace Eigen;
 
-Bundler::Bundler(std::shared_ptr<YAML::Node> yml1, DataLoaderBase *data_loader)
+Bundler::Bundler(std::shared_ptr<YAML::Node> yml1, DataLoaderBase *data_loader=NULL)
 {
   _data_loader = data_loader;
   yml = yml1;
@@ -77,11 +77,16 @@ void Bundler::processNewFrame(std::shared_ptr<Frame> frame)
     assert(last_frame->_status!=Frame::FAIL);
     frame->_id = last_frame->_id+1;
     frame->_pose_in_model = last_frame->_pose_in_model;
-    frame->segmentationByMaskFile();
+
+    if((*yml)["not_segmented"].as<int>()) {
+      frame->segmentationByMaskFile();
+    }
   }
   else
   {
-    frame->segmentationByMaskFile();
+    if((*yml)["not_segmented"].as<int>()) {
+      frame->segmentationByMaskFile();
+    }
   }
 
 
@@ -127,7 +132,6 @@ void Bundler::processNewFrame(std::shared_ptr<Frame> frame)
       return;
     }
 
-    PointCloudRGBNormal::Ptr cloud = _data_loader->_real_model;
     PointCloudRGBNormal::Ptr tmp(new PointCloudRGBNormal);
     Eigen::Matrix4f model_in_cam = frame->_pose_in_model.inverse();
 
@@ -282,7 +286,6 @@ void Bundler::optimizeGPU()
   const int num_iter_inner = (*yml)["bundle"]["num_iter_inner"].as<int>();
   const int min_fm_edges_newframe = (*yml)["bundle"]["min_fm_edges_newframe"].as<int>();
 
-
   std::sort(_local_frames.begin(), _local_frames.end(), FramePtrComparator());
   printf("#_local_frames=%d\n",_local_frames.size());
   for (int i=0;i<_local_frames.size();i++)
@@ -378,6 +381,7 @@ void Bundler::saveNewframeResult()
 
   if ((*yml)["LOG"].as<int>()>0)
   {
+    if(!_data_loader) return;
     cv::Mat color_viz = _newframe->_vis.clone();
     PointCloudRGBNormal::Ptr cur_model(new PointCloudRGBNormal);
     pcl::transformPointCloudWithNormals(*(_data_loader->_real_model),*cur_model,ob_in_cam);
