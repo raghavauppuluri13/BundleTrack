@@ -232,9 +232,7 @@ void Frame::depthToCloudAndNormals()
   cudaFree(xyz_map_gpu);
 }
 
-
-void Frame::segmentationByMaskFile()
-{
+void Frame::segmentationByMaskFile() {
   const std::string data_dir = (*yml)["data_dir"].as<std::string>();
   int scene_id =-1;
   {
@@ -287,7 +285,6 @@ void Frame::segmentationByMaskFile()
         max_id = h.first;
       }
     }
-
     if (max_num>0)
     {
       std::vector<cv::Point2i> pts;
@@ -315,11 +312,7 @@ void Frame::segmentationByMaskFile()
   cv::dilate(_fg_mask,_fg_mask,kernel);
 
   invalidatePixelsByMask(_fg_mask);
-
 }
-
-
-
 
 void Frame::invalidatePixel(const int h, const int w)
 {

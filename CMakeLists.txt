@@ -18,6 +18,15 @@ endif (${CMAKE_BUILD_TYPE} STREQUAL "Release")
 
 add_definitions(-DNO_OPENCV_CUDA=0)
 
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  sensor_msgs
+  cv_bridge
+  tf_conversions
+  tf
+)
+
+
 find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(PCL 1.9 REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -29,6 +38,25 @@ find_package(CUDA REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(LAPACK)
 
+catkin_package(
+    INCLUDE_DIRS src
+    CATKIN_DEPENDS 
+      roscpp
+      sensor_msgs
+      cv_bridge
+      tf
+      tf_conversions
+    DEPENDS 
+      OpenCV
+      CUDA
+      BLAS
+      OPENMP
+      PCL 1.9
+      yaml-cpp
+      LAPACK
+      GLUT
+      
+)
 
 include_directories(
   src
@@ -43,6 +71,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src/cuda/mLib/include
   ${PROJECT_SOURCE_DIR}/src/Thirdparty/cppzmq
   ${PROJECT_SOURCE_DIR}/src/Thirdparty
+  ${catkin_INCLUDE_DIRS}
 )
 
 file(GLOB MY_SRC ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/cuda/*.cpp ${PROJECT_SOURCE_DIR}/src/cuda/Solver/*.cpp)
@@ -58,8 +87,17 @@ set(YAML_CPP_LIBRARIES "/usr/local/lib/libyaml-cpp.so")
 add_library(${PROJECT_NAME} SHARED ${MY_SRC} ${my_cuda_obj})
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES} ${OpenMP_CXX_FLAGS} ${OPENGL_LIBRARY}  ${YAML_CPP_LIBRARIES} ${CUDA_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} zmq
 )
-add_executable(bundle_track_nocs  src/app/bundle_track_nocs.cpp)
-target_link_libraries(bundle_track_nocs ${PROJECT_NAME} )
+#add_executable(bundle_track_nocs  src/app/bundle_track_nocs.cpp)
+#target_link_libraries(bundle_track_nocs ${PROJECT_NAME} )
 
-add_executable(bundle_track_ycbineoat  src/app/bundle_track_ycbineoat.cpp)
-target_link_libraries(bundle_track_ycbineoat ${PROJECT_NAME} )
+#add_executable(bundle_track_ycbineoat  src/app/bundle_track_ycbineoat.cpp)
+#target_link_libraries(bundle_track_ycbineoat ${PROJECT_NAME} )
+
+add_executable(tracker_node src/tracker_node.cpp src/Bundler.cpp src/Frame.cpp)
+add_dependencies(tracker_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tracker_node 
+  ${PROJECT_NAME} 
+  ${catkin_LIBRARIES}
+  ${EIGEN_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
